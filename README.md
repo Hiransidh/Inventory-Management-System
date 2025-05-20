@@ -113,8 +113,7 @@ Each service is an independent Spring Boot application with its own:
 ## 📌 Note
 
 * This is a backend-only project.
-* No frontend UI, Docker, or cloud deployment is included.
-* This project is still under active development.
+* This project is still under active development of frontend UI and AWS integration.
 * Features are being added and refined progressively. Expect updates, improvements, and possible changes to APIs or architecture.
 
 ---
