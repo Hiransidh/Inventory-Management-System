@@ -1,9 +1,14 @@
 package com.smartinventory.auth_service.util;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import jakarta.annotation.PostConstruct;
 
+
+
+import java.security.Key;
 import java.util.Date;
 
 @Component
@@ -15,18 +20,29 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private long expiration;
 
+    private Key key;
+
+    @PostConstruct
+    public void init() {
+        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+    }
+
     public String generateToken(String email, String role) {
         return Jwts.builder()
                 .setSubject(email)
                 .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(SignatureAlgorithm.HS256, secret)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     public String extractEmail(String token) {
@@ -39,7 +55,8 @@ public class JwtUtil {
 
     public boolean isTokenValid(String token) {
         try {
-            return !extractAllClaims(token).getExpiration().before(new Date());
+            Claims claims = extractAllClaims(token);
+            return claims.getExpiration().after(new Date());
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }

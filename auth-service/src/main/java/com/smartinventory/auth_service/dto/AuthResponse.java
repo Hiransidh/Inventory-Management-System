@@ -1,11 +1,23 @@
 package com.smartinventory.auth_service.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@AllArgsConstructor
+@Setter
+@Getter
 public class AuthResponse {
+    // Getters and setters
     private String token;
     private String role;
+
+    // Default constructor
+    public AuthResponse() {
+    }
+
+    // Constructor with arguments
+    public AuthResponse(String token, String role) {
+        this.token = token;
+        this.role = role;
+    }
+
 }
